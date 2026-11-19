@@ -1,0 +1,115 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="Portals.Pages.PortalColourPage"
+    Title="Portal Colour">
+
+    <VerticalStackLayout
+        Padding="20"
+        Spacing="12">
+
+        <Label
+            Text="Choose Portal Colour"
+            FontSize="21"
+            FontAttributes="Bold"
+            HorizontalOptions="Center" />
+
+        <Label
+            Text="Select a background colour:"
+            FontSize="14" />
+
+        <Grid
+            ColumnDefinitions="*,*,*,*,*"
+            RowDefinitions="48,48"
+            ColumnSpacing="8"
+            RowSpacing="8">
+
+            <!-- Row 1 -->
+            <Button Grid.Row="0" Grid.Column="0"
+                BackgroundColor="#2878B8"
+                Clicked="OnColourSelected" />
+
+            <Button Grid.Row="0" Grid.Column="1"
+                BackgroundColor="#19765A"
+                Clicked="OnColourSelected" />
+
+            <Button Grid.Row="0" Grid.Column="2"
+                BackgroundColor="#8055A5"
+                Clicked="OnColourSelected" />
+
+            <Button Grid.Row="0" Grid.Column="3"
+                BackgroundColor="#B65D35"
+                Clicked="OnColourSelected" />
+
+            <Button Grid.Row="0" Grid.Column="4"
+                BackgroundColor="#455A64"
+                Clicked="OnColourSelected" />
+
+            <!-- Row 2 -->
+            <Button Grid.Row="1" Grid.Column="0"
+                BackgroundColor="#333333"
+                Clicked="OnColourSelected" />
+
+            <Button Grid.Row="1" Grid.Column="1"
+                BackgroundColor="#C18B24"
+                Clicked="OnColourSelected" />
+
+            <Button Grid.Row="1" Grid.Column="2"
+                BackgroundColor="#A83E55"
+                Clicked="OnColourSelected" />
+
+            <Button Grid.Row="1" Grid.Column="3"
+                BackgroundColor="#E5E7EB"
+                Clicked="OnColourSelected" />
+
+            <Button Grid.Row="1" Grid.Column="4"
+                BackgroundColor="#FFFFFF"
+                BorderColor="#888888"
+                BorderWidth="1"
+                Clicked="OnColourSelected" />
+
+        </Grid>
+
+        <Label
+            Text="Selected Colour"
+            FontAttributes="Bold"
+            HorizontalOptions="Center" />
+
+        <Border
+            x:Name="colourPreview"
+            BackgroundColor="#404040"
+            HeightRequest="65"
+            Stroke="#888888"
+            StrokeThickness="1"
+            Padding="8">
+
+            <Label
+                Text="New Portal"
+                TextColor="White"
+                FontSize="18"
+                FontAttributes="Bold"
+                HorizontalOptions="Center"
+                VerticalOptions="Center" />
+
+        </Border>
+
+        <HorizontalStackLayout
+            Spacing="15"
+            HorizontalOptions="Center">
+
+            <Button
+                Text="Apply"
+                WidthRequest="110"
+                Clicked="OnApplyClicked" />
+
+            <Button
+                Text="Cancel"
+                WidthRequest="110"
+                Clicked="OnCancelClicked" />
+
+        </HorizontalStackLayout>
+
+    </VerticalStackLayout>
+
+</ContentPage>

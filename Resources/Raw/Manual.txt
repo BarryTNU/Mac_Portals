@@ -1,0 +1,167 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Portals.Resources.Raw
+{
+    class Manual
+    {
+ # PORTALS
+
+## User Manual
+
+Version 1.0
+
+---
+
+## 1. Introduction
+
+Portals is a desktop organization utility designed to make managing files, folders and applications easier.
+
+It allows you to create individual areas, called Portals, directly on your Windows desktop. Each Portal acts as a convenient container for shortcuts to frequently used files, folders and applications.
+
+Instead of having icons scattered across the desktop, you can organize them into logical groups.
+
+Examples include:
+
+- Work – documents and work-related applications.
+- Finance – banking, spreadsheets and financial documents.
+- Photography – image folders and editing applications.
+- Personal – frequently used personal files and folders.
+
+Portals saves your configuration automatically, so your desktop organization is retained between sessions.
+
+## 2. Getting Started
+
+When Portals is first launched, the User Manual is displayed automatically.
+
+You can close the manual and begin creating your first Portal.
+
+The manual can also be opened at any time from the application's dropdown menu.
+
+Once installed, Portals runs in the background and does not interfere with your normal desktop usage.
+Portals runs automatically when Windows starts, so your desktop organization is always available.
+
+## 3. Creating a Portal
+
+Creating a Portal is straightforward.
+ 
+1. Click and drag your mouse to draw a rectangle around the area where you want the Portal.
+2. Release the mouse button to complete the selection.
+
+A new Portal will appear at the selected desktop location.
+
+When the Portal is first created, it is given a default name. You can change the name at any time.
+
+The default name is **New Portal**.
+when a portal is first created the Name field is open for editing. You can change the name at that time or later.
+
+### Naming a Portal
+
+To change the Portal name:
+
+1. Triple-click the Portal name.
+2. Enter your preferred name.
+3. Confirm the change by pressing Enter, or clicking outside the portal.
+
+Your new name will be saved automatically.
+
+## 4. Managing Portals
+
+Each Portal is an independent desktop window.
+Portals can be positioned on the desktop to suit your preferred layout.
+
+## 5. Adding Shortcuts
+
+Portals can contain shortcuts to files, folders and applications.
+
+To add a shortcut:
+
+1. Left Click and drag the Shortcut from its original location to the desired Portal.
+
+The shortcut will be added to the Portal, and removed from the Desktop
+
+The original file or application is not moved. Portals simply provides a convenient way to access it.
+
+(Note>  Some Shortcuts store their icon image in the original file. If the original file is moved or deleted, the shortcut may no longer display its icon correctly.
+If this is the case, you can manually change the icon image by right clicking the shortcut and selecting Properties. Then click Change Icon.)
+
+### Removing a Shortcut
+
+A shortcut can be dragged fron a Portal back onto the desktop, or into a folder.
+If you delete a portal, the Shortcuts within it are returned to the desktop.
+An exception is items which are links to files or folders.  These are not returned to the desktop. Instead they are deleted, leaving the original location unchanged.
+
+## 6. Saving Your Configuration
+
+Portals automatically saves its configuration.
+
+This includes information such as:
+
+- Portal names.
+- Portal positions.
+- Portal dimensions.
+- Portal appearance settings.
+- Shortcuts contained within each Portal.
+
+When you restart Portals, your previously saved configuration is restored.
+
+Your original files and folders remain in their existing locations.
+
+## 7. Changing the Portal apperance and state.
+
+Click the Menu box on the Title bar (3 vertical dots)
+ The options are: 
+    Keep Portal Visible
+            By default, Keep Portal Visible is checked. 
+            Click to Uncheck it.  
+            The portal minimises to just the title bar.
+            Move the mouse onto the title bar, and the Portal becomes Visible.
+            When the Mouse leaves the Portal, It again becomes minimised.
+    Change Portal Transparency
+            Transparency can be varied between 50% and 100% (100% is no Transparency)
+    Change Portal Colour
+            There are 10 colour choices, Select a colour, and click Apply
+    User Manual
+            This Manual.
+    Delete Portal
+            Confirm Deletion, and all the portal's Shortcuts are returned to the desktop.
+
+#Note:  The  Shartcut Right Click menu is not available when the shortcut is in a portal.  To access the Shortcut Right Click menu, drag the shortcut out of the portal onto the desktop.
+
+## 8. The User Manual
+
+You can access this manual whenever required.
+
+Select **Manual** from the Portals dropdown menu.
+
+The manual opens in a separate window, allowing you to refer to the instructions while working with Portals.
+
+The manual is displayed automatically the first time Portals is run. It will not automatically appear on subsequent launches.
+
+
+## 9. Tips for Organizing Your Desktop
+
+For the best results, consider the following:
+
+- Use descriptive Portal names.
+- Group related shortcuts together.
+- Avoid creating unnecessarily large numbers of Portals.
+- Arrange Portals so that frequently used items are easy to access.
+- Keep your desktop layout simple and consistent.
+
+## 10. Future Features
+
+Portals is an evolving application. Additional functionality is planned, including further desktop interaction and shortcut management options.
+
+Features will be added as development progresses.
+
+---
+
+**Portals**
+
+A simpler way to organize your Windows desktop.
+
+
+    }
+}

@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="Portals.Pages.PortalTransparencyPage"
+    Title="Portal Transparency">
+
+    <VerticalStackLayout
+        Padding="25"
+        Spacing="20">
+
+        <Label
+            x:Name="lblPortalName"
+            Text="Portal Transparency"
+            FontSize="22"
+            FontAttributes="Bold"
+            HorizontalOptions="Center" />
+
+        <BoxView HeightRequest="1"
+                 Color="LightGray" />
+
+        <Label
+            Text="Transparency"
+            FontSize="16"
+            FontAttributes="Bold" />
+
+        <Slider
+            x:Name="sldOpacity"
+            Minimum="50"
+            Maximum="100"
+            Value="90"
+            ValueChanged="OnOpacityChanged" />
+
+        <Label
+            x:Name="lblOpacity"
+            Text="90%"
+            FontSize="20"
+            HorizontalOptions="Center" />
+
+        <HorizontalStackLayout
+            Spacing="15"
+            HorizontalOptions="Center">
+
+            <Button
+                Text="Apply"
+                WidthRequest="110"
+                Clicked="OnApplyClicked" />
+
+            <Button
+                Text="Cancel"
+                WidthRequest="110"
+                Clicked="OnCancelClicked" />
+
+        </HorizontalStackLayout>
+
+    </VerticalStackLayout>
+
+</ContentPage>
