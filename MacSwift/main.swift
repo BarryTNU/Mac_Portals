@@ -870,9 +870,6 @@ final class DesktopSelectionManager {
     init(onSelectionCompleted: @escaping (NSRect) -> Void) {
         self.onSelectionCompleted = onSelectionCompleted
 
-            print("Desktop selection temporarily disabled")
-    return
-
         let eventMask: NSEvent.EventTypeMask = [
             .leftMouseDown,
             .leftMouseDragged,
@@ -1026,9 +1023,8 @@ private func finishSelection(at point: NSPoint) {
 
     onSelectionCompleted(finalRect)
 }
-
-
-   private func cancelSelection() {
+ 
+ private func cancelSelection() {
     resetSelection()
     print("Desktop rectangle selection cancelled")
 }
@@ -1045,6 +1041,7 @@ private func finishSelection(at point: NSPoint) {
         )
     }
 }
+
     
 
 /// Checks whether the pointer is over the desktop background,
