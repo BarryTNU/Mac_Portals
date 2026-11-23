@@ -1,6 +1,30 @@
 import AppKit
 import CoreGraphics
+import Darwin
+import Foundation
 
+// MARK: - Single Instance Protection
+
+let lockPath = "/tmp/PortalsMac.lock"
+
+let lockFileDescriptor = open(
+    lockPath,
+    O_CREAT | O_RDWR,
+    S_IRUSR | S_IWUSR
+)
+
+if lockFileDescriptor == -1 {
+    print("Unable to create Portals lock file.")
+    exit(1)
+}
+
+if flock(lockFileDescriptor, LOCK_EX | LOCK_NB) == -1 {
+    print("Another instance of Portals is already running. Exiting.")
+    close(lockFileDescriptor)
+    Darwin.exit(0)
+}
+
+print("Portals single-instance lock acquired.")
 
 // MARK: - Shared Notifications
 
@@ -210,10 +234,13 @@ var onDelete: (() -> Void)?
     alert.addButton(withTitle: "Delete")
     alert.addButton(withTitle: "Cancel")
 
-    if alert.runModal() == .alertFirstButtonReturn {
-        onDelete?()
+    alert.beginSheetModal(for: window) { response in
+
+    if response == .alertFirstButtonReturn {
+        self.onDelete?()
         window.close()
     }
+}
 }
 
     func appearanceComponents() -> (Double, Double, Double, Double) {
@@ -264,7 +291,7 @@ class PortalContentView: NSView {
     }
 
     override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
-        print("DRAG ENTERED PORTAL")
+       // print("DRAG ENTERED PORTAL")
         return .copy
     }
 
@@ -290,9 +317,9 @@ class PortalContentView: NSView {
                 let values = try url.resourceValues(forKeys: [.isAliasFileKey])
                 if values.isAliasFile == true {
                     acceptedAliases.append(url)
-                    print("Accepted alias: \(url.lastPathComponent)")
+                  //  print("Accepted alias: \(url.lastPathComponent)")
                 } else {
-                    print("Rejected non-alias: \(url.lastPathComponent)")
+                  //  print("Rejected non-alias: \(url.lastPathComponent)")
                 }
             } catch {
                 print("Could not identify item: \(url.lastPathComponent)")
@@ -300,7 +327,7 @@ class PortalContentView: NSView {
         }
 
         guard !acceptedAliases.isEmpty else {
-            print("No valid aliases dropped into Portal")
+          //  print("No valid aliases dropped into Portal")
             return false
         }
 
@@ -395,7 +422,7 @@ menuController.onDelete = { [weak self] in
     guard let self else { return }
 
     PortalStore.remove(id: self.portalID)
-    print("Portal deleted from storage: \(self.portalID)")
+   // print("Portal deleted from storage: \(self.portalID)")
 }
 
 configureWindow()
@@ -481,7 +508,7 @@ configureWindow()
 
         if save {
             savePortalState()
-            print("Portal title saved: \(titleField.stringValue)")
+           // print("Portal title saved: \(titleField.stringValue)")
         }
     }
 
@@ -499,11 +526,11 @@ configureWindow()
             guard let self else { return }
             for url in urls {
                 guard let storedURL = Self.storeAliasAndRemoveOriginal(url) else {
-                    print("Failed to add shortcut: \(url.lastPathComponent)")
+                  //  print("Failed to add shortcut: \(url.lastPathComponent)")
                     continue
                 }
                 self.addShortcut(storedURL)
-                print("Added shortcut: \(storedURL.lastPathComponent)")
+                // print("Added shortcut: \(storedURL.lastPathComponent)")
             }
             self.savePortalState()
         }
@@ -614,7 +641,7 @@ func restorePortalState(_ state: PortalSavedState) {
 
     for path in state.shortcutPaths {
         guard FileManager.default.fileExists(atPath: path) else {
-            print("Shortcut no longer exists: \(path)")
+           // print("Shortcut no longer exists: \(path)")
             continue
         }
 
@@ -622,7 +649,7 @@ func restorePortalState(_ state: PortalSavedState) {
     }
 
     arrangeShortcuts()
-    print("Portal restored: \(state.title)")
+  //  print("Portal restored: \(state.title)")
 }
 
 
@@ -697,7 +724,7 @@ func restorePortalState(_ state: PortalSavedState) {
             return
         }
 
-        print("Removing shortcut: \(button.title)")
+      //  print("Removing shortcut: \(button.title)")
         shortcutButtons.remove(at: index)
         button.removeFromSuperview()
         arrangeShortcuts()
@@ -733,8 +760,8 @@ func restorePortalState(_ state: PortalSavedState) {
             if self.contentView.bounds.contains(localPoint) {
                 self.moveShortcut(draggedButton, to: localPoint)
             } else {
-                print("SHORTCUT DROPPED OUTSIDE PORTAL")
-                print("Desktop position: \(NSStringFromPoint(screenPoint))")
+               // print("SHORTCUT DROPPED OUTSIDE PORTAL")
+                //      print("Desktop position: \(NSStringFromPoint(screenPoint))")
                 self.arrangeShortcuts()
                 self.savePortalState()
             }
@@ -782,10 +809,10 @@ func restorePortalState(_ state: PortalSavedState) {
 
             try fileManager.copyItem(at: sourceURL, to: destinationURL)
             try fileManager.removeItem(at: sourceURL)
-            print("Alias moved into Portal storage: \(destinationURL.path)")
+           // print("Alias moved into Portal storage: \(destinationURL.path)")
             return destinationURL
         } catch {
-            print("Could not move alias: \(error)")
+            //  print("Could not move alias: \(error)")
             return nil
         }
     }
@@ -867,8 +894,11 @@ final class DesktopSelectionManager {
 
     private let onSelectionCompleted: (NSRect) -> Void
 
+
     init(onSelectionCompleted: @escaping (NSRect) -> Void) {
         self.onSelectionCompleted = onSelectionCompleted
+
+        testFinderDesktopItems()
 
         let eventMask: NSEvent.EventTypeMask = [
             .leftMouseDown,
@@ -876,7 +906,7 @@ final class DesktopSelectionManager {
             .leftMouseUp,
             .keyDown
         ]
-
+/*
         eventMonitor = NSEvent.addGlobalMonitorForEvents(matching: eventMask) {
             [weak self] event in
             guard let self else { return }
@@ -889,11 +919,11 @@ final class DesktopSelectionManager {
                 }
             }
         }
-
+*/
         if eventMonitor == nil {
-            print("WARNING: Could not install the global mouse monitor.")
+       //    print("WARNING: Could not install the global mouse monitor.")
         } else {
-            print("Desktop rectangle selection monitor installed")
+      //     print("Desktop rectangle selection monitor installed")
         }
     }
 
@@ -902,6 +932,150 @@ final class DesktopSelectionManager {
             NSEvent.removeMonitor(eventMonitor)
         }
     }
+
+private func isOverDesktopIcon(_ point: NSPoint) -> Bool {
+
+    let source = """
+    tell application "Finder"
+        set outputText to ""
+        set itemNames to name of every item of desktop
+
+        repeat with itemName in itemNames
+            set desktopItem to item (contents of itemName) of desktop
+            set p to desktop position of desktopItem
+            set b to bounds of desktopItem
+
+            set leftEdge to (item 1 of p) + (item 1 of b)
+            set topEdge to (item 2 of p) + (item 2 of b)
+            set rightEdge to (item 1 of p) + (item 3 of b)
+            set bottomEdge to (item 2 of p) + (item 4 of b)
+
+            set outputText to outputText & leftEdge & "," & topEdge & "," & rightEdge & "," & bottomEdge & linefeed
+        end repeat
+
+        return outputText
+    end tell
+    """
+
+    guard let script = NSAppleScript(source: source) else { return false }
+
+    var error: NSDictionary?
+    let result = script.executeAndReturnError(&error)
+
+    guard error == nil, let output = result.stringValue else { return false }
+
+    let finderX = point.x
+    guard let screen = NSScreen.screens.first(where: { $0.frame.contains(point) }) else { return false }
+let finderY = screen.frame.maxY - point.y
+
+    for line in output.components(separatedBy: .newlines) {
+        let values = line.split(separator: ",").compactMap { Double($0) }
+
+        if values.count == 4 {
+            if finderX >= values[0] && finderX <= values[2] &&
+               finderY >= values[1] && finderY <= values[3] {
+                return true
+            }
+        }
+    }
+
+    return false
+}
+
+
+
+private func testFinderDesktopItems() {
+    let source = """
+    tell application "Finder"
+        set outputText to ""
+        set itemNames to name of every item of desktop
+
+        repeat with itemName in itemNames
+            set desktopItem to item (contents of itemName) of desktop
+            set p to desktop position of desktopItem
+            set b to bounds of desktopItem
+
+            set outputText to outputText & ¬
+    (contents of itemName) & "|" & ¬
+    (item 1 of p as text) & "|" & ¬
+    (item 2 of p as text) & "|" & ¬
+    (item 1 of b as text) & "|" & ¬
+    (item 2 of b as text) & "|" & ¬
+    (item 3 of b as text) & "|" & ¬
+    (item 4 of b as text) & linefeed
+        end repeat
+
+        return outputText
+    end tell
+    """
+
+    guard let script = NSAppleScript(source: source) else {
+        print("Could not create Finder AppleScript")
+        return
+    }
+
+    var error: NSDictionary?
+    let result = script.executeAndReturnError(&error)
+
+    if let error {
+        print("Finder AppleScript error: \(error)")
+    } else {
+        print("===== FINDER DESKTOP ITEMS =====")
+        print(result.stringValue ?? "No items returned")
+        print("================================")
+    }
+}
+
+
+
+private func testFinderIconCoordinates() {
+    let mouse = NSEvent.mouseLocation
+
+    guard let screen = NSScreen.screens.first(where: {
+        $0.frame.contains(mouse)
+    }) else {
+        return
+    }
+
+    let screenNumber = screen.deviceDescription[
+        NSDeviceDescriptionKey("NSScreenNumber")
+    ] as! NSNumber
+
+    let displayBounds = CGDisplayBounds(
+        CGDirectDisplayID(screenNumber.uint32Value)
+    )
+
+    let finderX = displayBounds.origin.x +
+        (mouse.x - screen.frame.origin.x)
+
+    let finderY = displayBounds.origin.y +
+        (screen.frame.maxY - mouse.y)
+
+    print("""
+    ===== COORDINATE CONVERSION =====
+    AppKit mouse: \(mouse)
+    Display: \(screen.localizedName)
+    Finder-style point: (\(finderX), \(finderY))
+    =================================
+    """)
+}
+
+
+private func testFinderCoordinates() {
+    print("===== SCREEN COORDINATES =====")
+
+    for screen in NSScreen.screens {
+        print("""
+        Screen: \(screen.localizedName)
+        Frame: \(screen.frame)
+        Visible frame: \(screen.visibleFrame)
+        """)
+    }
+
+    print("Current mouse position: \(NSEvent.mouseLocation)")
+}
+
+
 
     private func handle(_ event: NSEvent) {
 
@@ -934,6 +1108,44 @@ final class DesktopSelectionManager {
 
     private func beginSelectionIfOnDesktop(at point: NSPoint) {
 
+print("DIAGNOSTIC: beginSelectionIfOnDesktop called")
+
+testFinderDesktopItems()
+
+testFinderIconCoordinates()
+
+ func testFinderIconCoordinates() {
+    let mouse = NSEvent.mouseLocation
+
+    guard let screen = NSScreen.screens.first(where: {
+        $0.frame.contains(mouse)
+    }) else {
+        return
+    }
+
+    let screenNumber = screen.deviceDescription[
+        NSDeviceDescriptionKey("NSScreenNumber")
+    ] as! NSNumber
+
+    let displayBounds = CGDisplayBounds(
+        CGDirectDisplayID(screenNumber.uint32Value)
+    )
+
+    let finderX = displayBounds.origin.x +
+        (mouse.x - screen.frame.origin.x)
+
+    let finderY = displayBounds.origin.y +
+        (screen.frame.maxY - mouse.y)
+
+    print("""
+    ===== COORDINATE CONVERSION =====
+    AppKit mouse: \(mouse)
+    Display: \(screen.localizedName)
+    Finder-style point: (\(finderX), \(finderY))
+    =================================
+    """)
+}
+
     guard !isTrackingDesktopDrag else { return }
 
     guard isDesktopBackground(at: point) else { return }
@@ -941,7 +1153,7 @@ final class DesktopSelectionManager {
     guard let screen = NSScreen.screens.first(where: {
         $0.frame.contains(point)
     }) else {
-        print("Could not identify the display")
+       // print("Could not identify the display")
         return
     }
 
@@ -949,7 +1161,7 @@ final class DesktopSelectionManager {
     startPoint = point
     activeScreen = screen
 
-    print("Desktop drag tracking started")
+    // print("Desktop drag tracking started")
 }
 
 private func updateSelection(to point: NSPoint) {
@@ -973,7 +1185,7 @@ private func updateSelection(to point: NSPoint) {
         let overlay = DesktopSelectionOverlayWindow(screen: screen)
         overlayWindow = overlay
 
-        print("Desktop rectangle selection started")
+      //  print("Desktop rectangle selection started")
     }
 
     let rect = selectionRect(to: point, limitedTo: screen.frame)
@@ -1019,14 +1231,14 @@ private func finishSelection(at point: NSPoint) {
         height: height
     )
 
-    print("DESKTOP RECTANGLE READY: \(NSStringFromRect(finalRect))")
+   // print("DESKTOP RECTANGLE READY: \(NSStringFromRect(finalRect))")
 
     onSelectionCompleted(finalRect)
 }
  
  private func cancelSelection() {
     resetSelection()
-    print("Desktop rectangle selection cancelled")
+    //print("Desktop rectangle selection cancelled")
 }
 
     private func selectionRect(to point: NSPoint, limitedTo screenFrame: NSRect) -> NSRect {
@@ -1048,11 +1260,13 @@ private func finishSelection(at point: NSPoint) {
 /// without depending on the Finder application name.
 private func isDesktopBackground(at point: NSPoint) -> Bool {
 
+    print("DIAGNOSTIC: isDesktopBackground called")
+
     // Identify the monitor containing the pointer.
     guard let screen = NSScreen.screens.first(where: {
         $0.frame.contains(point)
     }) else {
-        print("Could not identify display")
+       // print("Could not identify display")
         return false
     }
 
@@ -1060,7 +1274,7 @@ private func isDesktopBackground(at point: NSPoint) -> Bool {
     guard let screenNumber = screen.deviceDescription[
         NSDeviceDescriptionKey("NSScreenNumber")
     ] as? NSNumber else {
-        print("Could not identify display number")
+       // print("Could not identify display number")
         return false
     }
 
@@ -1074,23 +1288,47 @@ private func isDesktopBackground(at point: NSPoint) -> Bool {
         y: displayBounds.origin.y + (screen.frame.maxY - point.y)
     )
 
-    print("MONITOR: \(screen.localizedName)")
-print("APPKIT POINT: \(point)")
-print("SCREEN FRAME: \(screen.frame)")
-print("QUARTZ DISPLAY BOUNDS: \(displayBounds)")
-print("CONVERTED QUARTZ POINT: \(quartzPoint)")
+   // print("MONITOR: \(screen.localizedName)")
+    //print("APPKIT POINT: \(point)")
+    //print("SCREEN FRAME: \(screen.frame)")
+    //print("QUARTZ DISPLAY BOUNDS: \(displayBounds)")
+    //print("CONVERTED QUARTZ POINT: \(quartzPoint)")
 
     guard let windowList = CGWindowListCopyWindowInfo(
         .optionOnScreenOnly,
         kCGNullWindowID
     ) as? [[String: Any]] else {
-        print("Could not inspect on-screen windows")
+        // print("Could not inspect on-screen windows")
         return false
     }
 
     let desktopIconLevel = Int(
         CGWindowLevelForKey(.desktopIconWindow)
     )
+
+// Diagnostic: list Finder windows, including those behind other windows.
+print("===== FINDER WINDOW LIST =====")
+
+for info in windowList {
+    let owner = info[kCGWindowOwnerName as String] as? String ?? ""
+
+    guard owner == "Finder",
+          let boundsInfo = info[kCGWindowBounds as String] as? NSDictionary,
+          let layer = info[kCGWindowLayer as String] as? NSNumber,
+          let number = info[kCGWindowNumber as String] as? NSNumber else {
+        continue
+    }
+
+    print("""
+    Finder window:
+      Number: \(number)
+      Layer: \(layer)
+      Bounds: \(boundsInfo)
+    """)
+}
+
+print("===== END FINDER WINDOW LIST =====")
+
 
     // Examine windows from front to back.
     for info in windowList {
@@ -1123,22 +1361,22 @@ print("CONVERTED QUARTZ POINT: \(quartzPoint)")
             height: height
         )
 
-        guard bounds.contains(quartzPoint) else {
-            continue
-        }
+       guard bounds.contains(quartzPoint) else {
+    continue
+}
 
-        let layer = layerNumber.intValue
+let layer = layerNumber.intValue
+// //let windowName = info[kCGWindowName as String] as? String ?? ""
+//  let windowNumber = info[kCGWindowNumber as String] as? NSNumber
 
-       if layer <= desktopIconLevel {
-    print("DESKTOP BACKGROUND DETECTED")
+   if owner == "Finder" && layer == desktopIconLevel {
     return true
 } else {
-    print("Application window detected: \(owner), layer \(layer)")
     return false
 }
     }
 
-    print("No window found at pointer")
+    // print("No window found at pointer")
     return false
 }
 
@@ -1195,6 +1433,7 @@ if savedPortals.isEmpty {
         portal.show()
         portal.savePortalState()
     }
+
 }
 
 
@@ -1202,7 +1441,7 @@ if savedPortals.isEmpty {
 
 let desktopSelectionManager = DesktopSelectionManager { selectedRect in
 
-    print("Creating Portal at: \(NSStringFromRect(selectedRect))")
+  // print("Creating Portal at: \(NSStringFromRect(selectedRect))")
 
     let newPortal = PortalController(
         frame: selectedRect,
@@ -1215,7 +1454,8 @@ let desktopSelectionManager = DesktopSelectionManager { selectedRect in
 newPortal.show()
 newPortal.savePortalState()
 
-print("New Portal created successfully")
+// print("New Portal created successfully")
 }
+
 
 app.run()
